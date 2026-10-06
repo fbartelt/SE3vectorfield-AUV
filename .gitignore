@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# ROS 2 / colcon generated
+build/
+install/
+log/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Optional: ignore local simulation outputs
+# Comment these out if you want to commit the .npz files.
+logs/*.npz
+# logs/*.csv
+# *.bag

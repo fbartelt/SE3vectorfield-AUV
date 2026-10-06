@@ -1,0 +1,1 @@
+export PYTHONPATH=$PYTHONPATH:$HOME/py312/lib/python3.12/site-packages
