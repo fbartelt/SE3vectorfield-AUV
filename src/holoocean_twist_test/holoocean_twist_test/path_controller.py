@@ -19,62 +19,56 @@ from datetime import datetime
 
 # Import your controller. Adjust the import path to match your package.
 import uaibot as ub
+from holoocean_twist_test.curves import build_curve  # adjust import path
 
 
-# ----------------------------------------------------------------------
-# Curve generation: circle of radius R with a full 360 deg barrel roll
-# ----------------------------------------------------------------------
-def circle_with_barrel_roll(
-    radius=3.0, z0=-3.0, center_xy=(0.0, -700.0), n_points=400, n_rolls=1.0
-):
-    """
-    Sample a circle in the world z = z0 plane, with a 360*n_rolls-degree
-    barrel roll about the tangent axis over one lap. Returns an (n, 4, 4)
-    array of homogeneous transforms in the world frame.
-    """
-    cx, cy = center_xy
-    curve = np.zeros((n_points, 4, 4))
-    omega = 2.0 * np.pi
-    S_omega = np.array([[0.0, -omega, 0.0], [omega, 0.0, 0.0], [0.0, 0.0, 0.0]])
-    dcurve = np.zeros((n_points, 4, 4))
-
-    for i in range(n_points):
-        s = 2.0 * np.pi * i / (n_points - 1)  # lap angle
-        phi = n_rolls * s  # barrel-roll angle
-        c, sn = np.cos(s), np.sin(s)
-        # Position
-        p = np.array([cx + radius * c, cy + radius * sn, z0])
-        # dp/ds
-        dp_ds = np.array([-omega * radius * sn, omega * radius * c, 0.0])
-
-        # Pre-roll frame: x = tangent, z = world up, y = z x x
-        x_axis = np.array([-np.sin(s), np.cos(s), 0.0])
-        x_axis /= np.linalg.norm(x_axis)
-        z_axis = np.array([0.0, 0.0, 1.0])
-        y_axis = np.cross(z_axis, x_axis)
-        y_axis /= np.linalg.norm(y_axis)
-        z_axis = np.cross(x_axis, y_axis)
-        R0 = np.column_stack([x_axis, y_axis, z_axis])
-
-        R = R0
-
-        # Barrel roll: rotate around x_axis by phi
-        # phi = np.deg2rad(-30) * 0
-        # c, sn = np.cos(phi), np.sin(phi)
-        # R_barrel = np.array([[1.0, 0.0, 0.0], [0.0, c, -sn], [0.0, sn, c]])
-        # R = R0 @ R_barrel
-        # R = np.eye(3)
-
-        T = np.eye(4)
-        T[:3, :3] = R
-        T[:3, 3] = p
-        curve[i] = T
-        dT = np.zeros((4, 4))
-        dT[:3, :3] = S_omega @ R
-        dT[:3,   3] = dp_ds
-        dcurve[i] = dT
-    return curve, dcurve
-
+# # ----------------------------------------------------------------------
+# # Curve generation: circle of radius R with a full 360 deg barrel roll
+# # ----------------------------------------------------------------------
+# def circle_with_barrel_roll(
+#     radius=3.0, z0=-3.0, center_xy=(0.0, -700.0), n_points=400, n_rolls=1.0
+# ):
+#     """
+#     Sample a circle in the world z = z0 plane, with a 360*n_rolls-degree
+#     barrel roll about the tangent axis over one lap. Returns an (n, 4, 4)
+#     array of homogeneous transforms in the world frame.
+#     """
+#     cx, cy = center_xy
+#     curve = np.zeros((n_points, 4, 4))
+#     omega = 2.0 * np.pi
+#     S_omega = np.array([[0.0, -omega, 0.0], [omega, 0.0, 0.0], [0.0, 0.0, 0.0]])
+#     dcurve = np.zeros((n_points, 4, 4))
+#
+#     for i in range(n_points):
+#         s = 2.0 * np.pi * i / (n_points - 1)  # lap angle
+#         phi = n_rolls * s  # barrel-roll angle
+#         c, sn = np.cos(s), np.sin(s)
+#         # Position
+#         p = np.array([cx + radius * c, cy + radius * sn, z0])
+#         # dp/ds
+#         dp_ds = np.array([-omega * radius * sn, omega * radius * c, 0.0])
+#
+#         # Pre-roll frame: x = tangent, z = world up, y = z x x
+#         x_axis = np.array([-np.sin(s), np.cos(s), 0.0])
+#         x_axis /= np.linalg.norm(x_axis)
+#         z_axis = np.array([0.0, 0.0, 1.0])
+#         y_axis = np.cross(z_axis, x_axis)
+#         y_axis /= np.linalg.norm(y_axis)
+#         z_axis = np.cross(x_axis, y_axis)
+#         R0 = np.column_stack([x_axis, y_axis, z_axis])
+#
+#         R = R0
+#
+#         T = np.eye(4)
+#         T[:3, :3] = R
+#         T[:3, 3] = p
+#         curve[i] = T
+#         dT = np.zeros((4, 4))
+#         dT[:3, :3] = S_omega @ R
+#         dT[:3,   3] = dp_ds
+#         dcurve[i] = dT
+#     return curve, dcurve
+#
 
 # ----------------------------------------------------------------------
 def quat_to_rot(x, y, z, w):
@@ -116,25 +110,51 @@ class PathController(Node):
         self.declare_parameter("twist_is_body_frame", False)
         # Set this to True if the twist ordering is [omega; v]
         self.declare_parameter("angular_first", False)
+        # Different curves
+        self.declare_parameter("curve_type", "circle")
+        self.declare_parameter("a", 2.0)
+        self.declare_parameter("b", 1.0)
+        self.declare_parameter("A", 2.0)
+        self.declare_parameter("B", 1.5)
+        self.declare_parameter("C", 0.5)
 
         self.agent_name = self.get_parameter("agent_name").value
         rate = self.get_parameter("rate_hz").value
         self.twist_is_body = self.get_parameter("twist_is_body_frame").value
         self.angular_first = self.get_parameter("angular_first").value
 
+        curve_type = self.get_parameter("curve_type").value
+        kwargs = {
+            "n_points": int(self.get_parameter("n_points").value),
+            "z0":       float(self.get_parameter("z0").value),
+            "center_xy": (float(self.get_parameter("center_x").value),
+                          float(self.get_parameter("center_y").value)),
+        }
+
+        if curve_type == "circle":
+            kwargs["radius"] = float(self.get_parameter("radius").value)
+        elif curve_type == "ellipse":
+            kwargs["a"] = float(self.get_parameter("a").value)
+            kwargs["b"] = float(self.get_parameter("b").value)
+        elif curve_type == "lissajous_3d":
+            kwargs["A"] = float(self.get_parameter("A").value)
+            kwargs["B"] = float(self.get_parameter("B").value)
+            kwargs["C"] = float(self.get_parameter("C").value)
+
         # Build curve
-        curve_, curve_derivative_ = circle_with_barrel_roll(
-            radius=float(self.get_parameter("radius").value),
-            z0=float(self.get_parameter("z0").value),
-            center_xy=(
-                float(self.get_parameter("center_x").value),
-                float(self.get_parameter("center_y").value),
-            ),
-            n_points=int(self.get_parameter("n_points").value),
-            n_rolls=float(self.get_parameter("n_rolls").value),
-        )
-        self.curve = curve_
-        self.curve_derivative = curve_derivative_
+        self.curve, self.curve_derivative = build_curve(curve_type, **kwargs)
+        # curve_, curve_derivative_ = circle_with_barrel_roll(
+        #     radius=float(self.get_parameter("radius").value),
+        #     z0=float(self.get_parameter("z0").value),
+        #     center_xy=(
+        #         float(self.get_parameter("center_x").value),
+        #         float(self.get_parameter("center_y").value),
+        #     ),
+        #     n_points=int(self.get_parameter("n_points").value),
+        #     n_rolls=float(self.get_parameter("n_rolls").value),
+        # )
+        # self.curve = curve_
+        # self.curve_derivative = curve_derivative_
 
         self.get_logger().info(
             f"Curve built: {self.curve.shape[0]} samples, "

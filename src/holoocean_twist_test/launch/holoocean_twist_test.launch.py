@@ -10,8 +10,23 @@ from launch.events import Shutdown
 MAX_TIME = 60.0
 CURVE_X0, CURVE_Y0, CURVE_Z0 = -2.0, -2.0, -2.0
 CURVE_POINTS = 5000
+
+# lissajous_3d
+# circle
+# ellipse
+CURVE_TYPE = "lissajous_3d"
+
 CURVE_RADIUS = 1.5 * 2
 CURVE_N_ROLLS = 0.0
+
+# Ellipse
+ELLIPSE_A = 2.0
+ELLIPSE_B = 1.0
+
+# Lissajous
+# ELLIPSE_A = 2.0
+# ELLIPSE_B = 1.5
+LISSAJOUS_C = 0.5
 
 kn1 = 0.6
 kn2 = 1.0
@@ -100,6 +115,10 @@ def generate_launch_description():
                 "center_y": CURVE_Y0,
                 "n_points": CURVE_POINTS,
                 "n_rolls": CURVE_N_ROLLS,
+                "curve_type": CURVE_TYPE,
+                "a": ELLIPSE_A,
+                "b": ELLIPSE_B,
+                "c": LISSAJOUS_C,
                 "kt1": kt1,
                 "kt2": kt2,
                 "kt3": kt3,
@@ -127,6 +146,10 @@ def generate_launch_description():
                 "z0": CURVE_Z0,
                 "center_x": CURVE_X0,
                 "center_y": CURVE_Y0,
+                "curve_type": CURVE_TYPE,
+                "a": ELLIPSE_A,
+                "b": ELLIPSE_B,
+                "c": LISSAJOUS_C,
                 "n_points": 200,  # visual only; 300 is plenty for drawing
                 "n_rolls": CURVE_N_ROLLS,
                 "show_trail": True,
