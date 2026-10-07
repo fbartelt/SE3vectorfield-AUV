@@ -39,7 +39,7 @@ def circle_with_barrel_roll(
     dcurve = np.zeros((n_points, 4, 4))
 
     for i in range(n_points):
-        s = 2.0 * np.pi * i / n_points  # lap angle
+        s = 2.0 * np.pi * i / (n_points - 1)  # lap angle
         phi = n_rolls * s  # barrel-roll angle
         c, sn = np.cos(s), np.sin(s)
         # Position
@@ -49,6 +49,7 @@ def circle_with_barrel_roll(
 
         # Pre-roll frame: x = tangent, z = world up, y = z x x
         x_axis = np.array([-np.sin(s), np.cos(s), 0.0])
+        x_axis /= np.linalg.norm(x_axis)
         z_axis = np.array([0.0, 0.0, 1.0])
         y_axis = np.cross(z_axis, x_axis)
         y_axis /= np.linalg.norm(y_axis)

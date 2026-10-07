@@ -7,12 +7,17 @@ from launch.actions import RegisterEventHandler, EmitEvent
 from launch.event_handlers import OnProcessExit
 from launch.events import Shutdown
 
-MAX_TIME = 150.0
+MAX_TIME = 60.0
 CURVE_X0, CURVE_Y0, CURVE_Z0 = -2.0, -2.0, -2.0
 CURVE_POINTS = 5000
 CURVE_RADIUS = 1.5 * 2
 CURVE_N_ROLLS = 0.0
 
+kn1 = 0.6
+kn2 = 1.0
+kt1 = 0.05
+kt2 = 1.0
+kt3 = kn2
 
 def generate_launch_description():
     # Reuse the example's config YAML - it already sets 'scenario' and agent names
@@ -95,11 +100,11 @@ def generate_launch_description():
                 "center_y": CURVE_Y0,
                 "n_points": CURVE_POINTS,
                 "n_rolls": CURVE_N_ROLLS,
-                "kt1": 0.05,
-                "kt2": 1.0,
-                "kt3": 0.75,
-                "kn1": 1.0,
-                "kn2": 0.75,
+                "kt1": kt1,
+                "kt2": kt2,
+                "kt3": kt3,
+                "kn1": kn1,
+                "kn2": kn2,
                 "twist_is_body_frame": False,
                 "angular_first": False,
             }

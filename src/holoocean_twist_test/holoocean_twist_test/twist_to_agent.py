@@ -85,11 +85,11 @@ class VelocityAdapter(Node):
         self.max_v_ang = float(self.get_parameter("max_v_ang").value)
 
         # PID gains (body frame): [u, v, w, p, q, r]
-        kp_p, kp_w = 40.0, 4.0
+        kp_p, kp_w = 40.0, 4.0 * 0.5
         self.kp = 1e-1 * np.array([kp_p, kp_p, kp_p, kp_w, kp_w, kp_w])
-        ki_p, ki_w = 5.0, 0.5
+        ki_p, ki_w = 5.0, 0.5 * 0.5
         self.ki = 1e-1 * np.array([ki_p, ki_p, ki_p, ki_w, ki_w, ki_w])
-        kd_p, kd_w = 2.0, 0.1
+        kd_p, kd_w = 2.0, 0.1 * 0.5
         self.kd = 1e-1 * np.array([kd_p, kd_p, kd_p, kd_w, kd_w, kd_w])
         self.i_clamp = np.array([5.0, 5.0, 5.0, 1.0, 1.0, 1.0])
 

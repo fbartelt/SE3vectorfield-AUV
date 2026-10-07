@@ -123,7 +123,7 @@ def create_pid_fig():
         vertical_spacing=0.03,
         subplot_titles=(
             "Velocity: desired vs current (body frame)",
-            "Velocity error e = v_des - v_cur",
+            "Velocity error magnitudes (linear / angular)",
             "Integral term",
             "Derivative term",
             "Commanded wrench tau",
