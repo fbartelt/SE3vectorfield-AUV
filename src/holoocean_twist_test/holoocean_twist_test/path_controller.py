@@ -22,55 +22,6 @@ import uaibot as ub
 from holoocean_twist_test.curves import build_curve  # adjust import path
 
 
-# # ----------------------------------------------------------------------
-# # Curve generation: circle of radius R with a full 360 deg barrel roll
-# # ----------------------------------------------------------------------
-# def circle_with_barrel_roll(
-#     radius=3.0, z0=-3.0, center_xy=(0.0, -700.0), n_points=400, n_rolls=1.0
-# ):
-#     """
-#     Sample a circle in the world z = z0 plane, with a 360*n_rolls-degree
-#     barrel roll about the tangent axis over one lap. Returns an (n, 4, 4)
-#     array of homogeneous transforms in the world frame.
-#     """
-#     cx, cy = center_xy
-#     curve = np.zeros((n_points, 4, 4))
-#     omega = 2.0 * np.pi
-#     S_omega = np.array([[0.0, -omega, 0.0], [omega, 0.0, 0.0], [0.0, 0.0, 0.0]])
-#     dcurve = np.zeros((n_points, 4, 4))
-#
-#     for i in range(n_points):
-#         s = 2.0 * np.pi * i / (n_points - 1)  # lap angle
-#         phi = n_rolls * s  # barrel-roll angle
-#         c, sn = np.cos(s), np.sin(s)
-#         # Position
-#         p = np.array([cx + radius * c, cy + radius * sn, z0])
-#         # dp/ds
-#         dp_ds = np.array([-omega * radius * sn, omega * radius * c, 0.0])
-#
-#         # Pre-roll frame: x = tangent, z = world up, y = z x x
-#         x_axis = np.array([-np.sin(s), np.cos(s), 0.0])
-#         x_axis /= np.linalg.norm(x_axis)
-#         z_axis = np.array([0.0, 0.0, 1.0])
-#         y_axis = np.cross(z_axis, x_axis)
-#         y_axis /= np.linalg.norm(y_axis)
-#         z_axis = np.cross(x_axis, y_axis)
-#         R0 = np.column_stack([x_axis, y_axis, z_axis])
-#
-#         R = R0
-#
-#         T = np.eye(4)
-#         T[:3, :3] = R
-#         T[:3, 3] = p
-#         curve[i] = T
-#         dT = np.zeros((4, 4))
-#         dT[:3, :3] = S_omega @ R
-#         dT[:3,   3] = dp_ds
-#         dcurve[i] = dT
-#     return curve, dcurve
-#
-
-# ----------------------------------------------------------------------
 def quat_to_rot(x, y, z, w):
     n = x * x + y * y + z * z + w * w
     if n < 1e-12:
