@@ -30,6 +30,7 @@ setup(
             "twist_to_agent = holoocean_twist_test.twist_to_agent:main",
             "path_controller = holoocean_twist_test.path_controller:main",
             "path_visualizer  = holoocean_twist_test.path_visualizer:main",
+            "baseline_controller = holoocean_twist_test.baseline_controller:main",
         ],
     },
 )

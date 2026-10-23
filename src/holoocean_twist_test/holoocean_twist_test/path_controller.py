@@ -75,6 +75,8 @@ class PathController(Node):
         self.angular_first = self.get_parameter("angular_first").value
 
         curve_type = self.get_parameter("curve_type").value
+        self.curve_type = curve_type
+
         kwargs = {
             "n_points": int(self.get_parameter("n_points").value),
             "z0":       float(self.get_parameter("z0").value),
@@ -230,7 +232,7 @@ class PathController(Node):
         out_dir = os.path.expanduser("~/holoocean_ws/logs")
         os.makedirs(out_dir, exist_ok=True)
         path = os.path.join(out_dir, f"path_track_{self.run_stamp}.npz")
-        path = os.path.join(out_dir, "path_track.npz")
+        path = os.path.join(out_dir, f"path_track_{self.curve_type}.npz")
         np.savez(
             path,
             t=np.array(self.log_t),

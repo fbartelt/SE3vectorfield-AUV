@@ -8,7 +8,7 @@ from launch.event_handlers import OnProcessExit
 from launch.events import Shutdown
 
 MAX_TIME = 60.0 * 40.0
-CURVE_X0, CURVE_Y0, CURVE_Z0 = -2.0*0, -2.0*0, -4.0
+CURVE_X0, CURVE_Y0, CURVE_Z0 = -2.0 * 0, -2.0 * 0, -4.0
 CURVE_POINTS = 15000
 
 # lissajous_3d
@@ -34,6 +34,21 @@ kn2 = 1.0
 kt1 = 0.05
 kt2 = 1.0
 kt3 = kn2
+
+baseline_alpha = 15.0
+baseline_vel = 0.5
+baseline_gamma = 0.2
+
+# ours, baseline
+control_case = "baseline"
+# This is only relevant for baseline controller (either uses R⁶ with
+# Rezende's VF with Euler angles or
+# position with Rezende's VF plus proportional angle correction)
+decoupled = True
+
+
+controller_name = "path_controller" if control_case == "ours" else "baseline_controller"
+
 
 def generate_launch_description():
     # Reuse the example's config YAML - it already sets 'scenario' and agent names
@@ -100,7 +115,9 @@ def generate_launch_description():
 
     twist_node = Node(
         package="holoocean_twist_test",
-        executable="path_controller",
+        # executable="path_controller",
+        # executable="baseline_controller",  # <-- was "path_controller"
+        executable=controller_name,  # <-- was "path_controller"
         name="path_controller",
         # namespace=holoocean_ns,
         output="screen",
@@ -129,6 +146,9 @@ def generate_launch_description():
                 "kn2": kn2,
                 "twist_is_body_frame": False,
                 "angular_first": False,
+                "alpha": baseline_alpha,
+                "const_vel": baseline_vel,
+                "gamma": baseline_gamma,
             }
         ],
     )
