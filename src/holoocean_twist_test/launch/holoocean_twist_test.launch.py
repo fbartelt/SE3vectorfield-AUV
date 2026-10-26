@@ -14,7 +14,9 @@ CURVE_POINTS = 15000
 # lissajous_3d
 # circle
 # ellipse
-CURVE_TYPE = "lissajous_3d"
+# trefoil
+# vertical_coil
+CURVE_TYPE = "circle"
 
 CURVE_RADIUS = 1.5 * 2 * 2
 CURVE_N_ROLLS = 0.0
@@ -29,6 +31,15 @@ LISSAJOUS_A = 1.5 * 4
 LISSAJOUS_B = 1.5 * 4
 LISSAJOUS_C = 0.3
 
+# Trefoil
+TREFOIL_R = 2.0
+TREFOIL_Z_AMP = 1.0 
+
+# Cylinder surface
+TREFOIL_R = 2.0
+TREFOIL_Z_AMP = 1.0 
+CYLINDER_N_OSCILLATIONS = 3
+
 kn1 = 0.6
 kn2 = 1.0
 kt1 = 0.05
@@ -41,6 +52,7 @@ baseline_gamma = 0.2
 
 # ours, baseline
 control_case = "baseline"
+control_case = "ours"
 # This is only relevant for baseline controller (either uses R⁶ with
 # Rezende's VF with Euler angles or
 # position with Rezende's VF plus proportional angle correction)
@@ -90,8 +102,10 @@ def generate_launch_description():
 
     adapter_node = Node(
         package="holoocean_twist_test",
-        executable="twist_to_agent",
-        name="twist_to_agent",
+        # executable="twist_to_agent",
+        # name="twist_to_agent",
+        executable="pose_bypass_adapter",
+        name="pose_bypass_adapter",
         namespace=holoocean_ns,
         output="screen",
         parameters=[
@@ -126,7 +140,7 @@ def generate_launch_description():
                 "use_sim_time": True,  # <-- add this
                 "max_sim_time": MAX_TIME,  # match the controller
                 "agent_name": "auv0",
-                "rate_hz": 1000.0,
+                "rate_hz": 50.0,
                 "radius": CURVE_RADIUS,
                 "z0": CURVE_Z0,
                 "center_x": CURVE_X0,
@@ -139,6 +153,9 @@ def generate_launch_description():
                 "A": LISSAJOUS_A,
                 "B": LISSAJOUS_B,
                 "C": LISSAJOUS_C,
+                "R": TREFOIL_R,
+                "z_amp": TREFOIL_Z_AMP,
+                "N_oscillations": CYLINDER_N_OSCILLATIONS,
                 "kt1": kt1,
                 "kt2": kt2,
                 "kt3": kt3,

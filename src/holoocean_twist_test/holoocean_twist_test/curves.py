@@ -149,6 +149,95 @@ def make_lissajous_3d(
     return _sample(p, dp, ddp, n_points)
 
 
+def make_trefoil_knot(R=3.0, z_amp=0.4, z0=-2.0, center_xy=(0.0, 0.0), n_points=5000):
+    """
+    A flattened 3D trefoil knot.
+    - R: horizontal scale
+    - z_amp: vertical scale
+    """
+    cx, cy = center_xy
+    w = 2.0 * np.pi
+    w2 = w * w
+
+    def p(s):
+        th = w * s
+        return np.array(
+            [
+                cx + R * (np.sin(th) + 2.0 * np.sin(2.0 * th)),
+                cy + R * (np.cos(th) - 2.0 * np.cos(2.0 * th)),
+                z0 + z_amp * np.sin(3.0 * th),
+            ]
+        )
+
+    def dp(s):
+        th = w * s
+        return np.array(
+            [
+                w * R * (np.cos(th) + 4.0 * np.cos(2.0 * th)),
+                w * R * (-np.sin(th) + 4.0 * np.sin(2.0 * th)),
+                w * z_amp * 3.0 * np.cos(3.0 * th),
+            ]
+        )
+
+    def ddp(s):
+        th = w * s
+        return np.array(
+            [
+                w2 * R * (-np.sin(th) - 8.0 * np.sin(2.0 * th)),
+                w2 * R * (-np.cos(th) + 8.0 * np.cos(2.0 * th)),
+                -w2 * z_amp * 9.0 * np.sin(3.0 * th),
+            ]
+        )
+
+    return _sample(p, dp, ddp, n_points)
+
+
+def make_vertical_coil(
+    R=2.0, z_amp=0.8, N_oscillations=3, z0=-2.0, center_xy=(0.0, 0.0), n_points=5000
+):
+    """
+    A coil wrapped around a vertical cylinder.
+    - R: radius of the cylinder
+    - z_amp: vertical amplitude of the coil
+    - N_oscillations: number of times it goes up and down per lap (must be integer)
+    """
+    cx, cy = center_xy
+    w = 2.0 * np.pi
+    w2 = w * w
+
+    def p(s):
+        th = w * s
+        return np.array(
+            [
+                cx + R * np.cos(th),
+                cy + R * np.sin(th),
+                z0 + z_amp * np.sin(N_oscillations * th),
+            ]
+        )
+
+    def dp(s):
+        th = w * s
+        return np.array(
+            [
+                -w * R * np.sin(th),
+                w * R * np.cos(th),
+                w * z_amp * N_oscillations * np.cos(N_oscillations * th),
+            ]
+        )
+
+    def ddp(s):
+        th = w * s
+        return np.array(
+            [
+                -w2 * R * np.cos(th),
+                -w2 * R * np.sin(th),
+                -w2 * z_amp * (N_oscillations**2) * np.sin(N_oscillations * th),
+            ]
+        )
+
+    return _sample(p, dp, ddp, n_points)
+
+
 # ==========================================================================
 # Registry
 # ==========================================================================
@@ -156,6 +245,8 @@ CURVE_BUILDERS = {
     "circle": make_circle,
     "ellipse": make_ellipse,
     "lissajous_3d": make_lissajous_3d,
+    "trefoil": make_trefoil_knot,
+    "vertical_coil": make_vertical_coil,
 }
 
 

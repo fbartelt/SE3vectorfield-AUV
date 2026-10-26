@@ -68,7 +68,9 @@ class PathController(Node):
         self.declare_parameter("A", 2.0)
         self.declare_parameter("B", 1.5)
         self.declare_parameter("C", 0.5)
-
+        self.declare_parameter("R", 3.0)
+        self.declare_parameter("z_amp", 0.4)
+        self.declare_parameter("N_oscillations", 3)
         self.agent_name = self.get_parameter("agent_name").value
         rate = self.get_parameter("rate_hz").value
         self.twist_is_body = self.get_parameter("twist_is_body_frame").value
@@ -79,9 +81,11 @@ class PathController(Node):
 
         kwargs = {
             "n_points": int(self.get_parameter("n_points").value),
-            "z0":       float(self.get_parameter("z0").value),
-            "center_xy": (float(self.get_parameter("center_x").value),
-                          float(self.get_parameter("center_y").value)),
+            "z0": float(self.get_parameter("z0").value),
+            "center_xy": (
+                float(self.get_parameter("center_x").value),
+                float(self.get_parameter("center_y").value),
+            ),
         }
 
         if curve_type == "circle":
@@ -93,6 +97,13 @@ class PathController(Node):
             kwargs["A"] = float(self.get_parameter("A").value)
             kwargs["B"] = float(self.get_parameter("B").value)
             kwargs["C"] = float(self.get_parameter("C").value)
+        elif curve_type == "trefoil":
+            kwargs["R"] = float(self.get_parameter("R").value)
+            kwargs["z_amp"] = float(self.get_parameter("z_amp").value)
+        elif curve_type == "vertical_coil":
+            kwargs["R"] = float(self.get_parameter("R").value)
+            kwargs["z_amp"] = float(self.get_parameter("z_amp").value)
+            kwargs["N_oscillations"] = int(self.get_parameter("N_oscillations").value)
 
         # Build curve
         self.curve, self.curve_derivative = build_curve(curve_type, **kwargs)

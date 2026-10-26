@@ -32,6 +32,9 @@ class PathVisualizer(Node):
         self.declare_parameter('A', 2.0)
         self.declare_parameter('B', 1.5)
         self.declare_parameter('C', 0.5)
+        self.declare_parameter("R", 3.0)
+        self.declare_parameter("z_amp", 0.4)
+        self.declare_parameter("N_oscillations", 3)
         self.declare_parameter('z0', -1.0)
         self.declare_parameter('center_x', 0.0)
         self.declare_parameter('center_y', 0.0)
@@ -62,6 +65,13 @@ class PathVisualizer(Node):
             kwargs["A"] = float(self.get_parameter('A').value)
             kwargs["B"] = float(self.get_parameter('B').value)
             kwargs["C"] = float(self.get_parameter('C').value)
+        elif curve_type == "trefoil":
+            kwargs["R"] = float(self.get_parameter("R").value)
+            kwargs["z_amp"] = float(self.get_parameter("z_amp").value)
+        elif curve_type == "vertical_coil":
+            kwargs["R"] = float(self.get_parameter("R").value)
+            kwargs["z_amp"] = float(self.get_parameter("z_amp").value)
+            kwargs["N_oscillations"] = int(self.get_parameter("N_oscillations").value)
 
         curve, _ = build_curve(curve_type, **kwargs)   # (n, 4, 4)
 
