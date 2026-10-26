@@ -31,6 +31,8 @@ setup(
             "path_controller = holoocean_twist_test.path_controller:main",
             "path_visualizer  = holoocean_twist_test.path_visualizer:main",
             "baseline_controller = holoocean_twist_test.baseline_controller:main",
+            "rotation_test = holoocean_twist_test.rotation_test:main",
+            "pose_bypass_adapter = holoocean_twist_test.pose_bypass_adapter:main",
         ],
     },
 )
